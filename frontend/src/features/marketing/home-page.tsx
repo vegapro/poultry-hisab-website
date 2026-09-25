@@ -19,7 +19,7 @@ export function HomePage({ mainAppUrl, onStartTrial }: HomePageProps) {
     <section className="hero">
       <img className="hero__image" src={heroImage} alt="Farm worker checking a poultry shed" />
       <div className="hero__shade" />
-      <header className="nav"><a className="brand" href="#top"><img src={logoImage} alt="PoultryHisab logo" /> <span>PoultryHisab</span></a><nav><a href="#how-it-works">How it works</a><a href="#results">For owners</a><a className="nav__login" href={mainAppUrl}>Login</a><Button onClick={onStartTrial}>Start free trial <ArrowRight size={17} /></Button></nav></header>
+      <header className="nav"><a className="brand" href="#top"><img className="brand__mark" src={logoImage} alt="PoultryHisab logo" /> <span>PoultryHisab</span></a><nav><a href="#how-it-works">How it works</a><a href="#results">For owners</a><a className="nav__login" href={mainAppUrl}>Login</a><Button onClick={onStartTrial}>Start free trial <ArrowRight size={17} /></Button></nav></header>
       <div className="hero__content" id="top"><p className="eyebrow eyebrow--light">Poultry farm operations, made visible</p><h1>Know what is happening in every shed. Know what every batch earns.</h1><p>Workers enter daily farm data on WhatsApp. You see feed, mortality, missing entries, payments, and final batch profit in one place.</p><div className="hero__actions"><Button onClick={onStartTrial}>Start free trial <ArrowRight size={18} /></Button><a className="text-link text-link--light" href="#how-it-works">See the workflow</a></div></div>
     </section>
 

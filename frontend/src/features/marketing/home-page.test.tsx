@@ -14,6 +14,7 @@ describe('HomePage', () => {
 
     expect(screen.getByRole('link', { name: 'Login' })).toHaveAttribute('href', 'https://owner.example.com');
     expect(screen.getByAltText('PoultryHisab logo')).toHaveAttribute('src', expect.stringContaining('poultryhisab-logo'));
+    expect(screen.getByAltText('PoultryHisab logo')).toHaveClass('brand__mark');
 
     fireEvent.click(screen.getAllByRole('button', { name: /start free trial/i })[0]);
     expect(onStartTrial).toHaveBeenCalledOnce();
@@ -34,5 +35,11 @@ describe('HomePage', () => {
     expect(document.querySelector('main')).toBeInTheDocument();
     expect(styles).toContain('overflow-x: clip');
     expect(styles).toContain('@media (max-width: 760px)');
+  });
+
+  it('uses a white circular badge for the brand logo', () => {
+    expect(styles).toContain('.brand__mark');
+    expect(styles).toContain('background: #fff');
+    expect(styles).toContain('border-radius: 50%');
   });
 });
