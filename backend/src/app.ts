@@ -13,6 +13,7 @@ interface CreateAppOptions {
 }
 
 interface BodyParserError extends Error {
+  code?: string;
   type?: string;
   status?: number;
   statusCode?: number;
@@ -21,6 +22,7 @@ interface BodyParserError extends Error {
 export function createApp({ repository, config }: CreateAppOptions): express.Express {
   const app = express();
 
+  app.set('trust proxy', 1);
   app.use(helmet());
   app.use((request, response, next) => {
     const origin = request.get('origin');
@@ -49,7 +51,7 @@ export function createApp({ repository, config }: CreateAppOptions): express.Exp
       response.status(400).json({ message: 'Please check the submitted details.' });
       return;
     }
-    if (error instanceof TrialSlugConflictError) {
+    if (error instanceof TrialSlugConflictError || error.code === '23505') {
       response.status(409).json({ message: 'This farm is already awaiting review. Please contact PoultryHisab.' });
       return;
     }

@@ -88,6 +88,15 @@ describe('POST /api/trial-applications', () => {
     expect(repository.create).not.toHaveBeenCalled();
   });
 
+  it('maps an active-slug index race to the same generic conflict response', async () => {
+    repository.create.mockRejectedValue({ code: '23505' });
+
+    const response = await request(app).post('/api/trial-applications').send(validApplication);
+
+    expect(response.status).toBe(409);
+    expect(response.body).toEqual({ message: 'This farm is already awaiting review. Please contact PoultryHisab.' });
+  });
+
   it('rejects worker assignments not present in the submitted shed list', async () => {
     const invalid = structuredClone(validApplication);
     invalid.workers[0].sheds = ['Unknown Shed'];
