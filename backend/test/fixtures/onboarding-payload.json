@@ -1,0 +1,61 @@
+{
+  "tenant": {
+    "name": "Kumar Poultry Farm",
+    "slug": "kumar-poultry-farm"
+  },
+  "config": {
+    "timezone": "Asia/Kolkata",
+    "whatsappDeliveryMode": "LIVE",
+    "feedReminderCron": "0 0 1 1 *",
+    "dailyReminderCron": "0 17 * * *",
+    "vaccinationReminderCron": "0 0 1 1 *",
+    "missingEntryAlertCron": "0 18 * * *",
+    "weeklyReportCron": "0 10 * * 1",
+    "monthlyReportCron": "0 10 1 * *",
+    "salesAlertsEnabled": true,
+    "paymentRemindersEnabled": true,
+    "mortalityAlertPercent": 4,
+    "feedStockLowThresholdKg": 800,
+    "paymentReminderDays": 7
+  },
+  "farm": {
+    "name": "Kumar Poultry Farm",
+    "location": "Prayagraj, Uttar Pradesh",
+    "openingFeedStockKg": 5000,
+    "openingFeedStockRatePerKg": 35
+  },
+  "sheds": [
+    {
+      "name": "Shed 1",
+      "capacity": 5000,
+      "batch": {
+        "name": "September Batch",
+        "startDate": "2026-09-25",
+        "birdCount": 4500,
+        "maleCount": 4500,
+        "femaleCount": 0
+      }
+    }
+  ],
+  "owners": [
+    {
+      "name": "Anil Kumar",
+      "phone": "+919876543210",
+      "role": "FARM_OWNER"
+    }
+  ],
+  "workers": [
+    {
+      "name": "Ramesh",
+      "phone": "+919876543211",
+      "language": "hi",
+      "sheds": [
+        "Shed 1"
+      ],
+      "modules": [
+        "FEED",
+        "MORTALITY"
+      ]
+    }
+  ]
+}
