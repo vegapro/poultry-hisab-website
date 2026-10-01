@@ -58,12 +58,12 @@ describe('trial application schema', () => {
     expect(() => trialApplicationSchema.parse(invalid)).toThrow('assigned shed');
   });
 
-  it('rejects gender totals greater than birds placed', () => {
+  it('rejects gender totals that do not equal birds placed', () => {
     const invalid = structuredClone(validApplication);
     invalid.sheds[0].maleCount = 4400;
     invalid.sheds[0].femaleCount = 200;
 
-    expect(() => trialApplicationSchema.parse(invalid)).toThrow('cannot exceed');
+    expect(() => trialApplicationSchema.parse(invalid)).toThrow('must equal');
   });
 });
 
