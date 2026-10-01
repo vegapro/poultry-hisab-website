@@ -62,8 +62,11 @@ export const trialFormSchema = z
     const ownerPhone = normalizeIndianPhone(value.owner.phone);
 
     value.sheds.forEach((shed, index) => {
-      if (shed.maleCount + shed.femaleCount > shed.birdCount) {
-        context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'femaleCount'], message: 'Male and female counts cannot exceed birds placed.' });
+      if (shed.capacity < shed.birdCount) {
+        context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'capacity'], message: 'Shed capacity cannot be lower than birds placed.' });
+      }
+      if (shed.maleCount + shed.femaleCount !== shed.birdCount) {
+        context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'femaleCount'], message: 'Male and female counts must equal birds placed.' });
       }
     });
 

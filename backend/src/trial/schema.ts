@@ -86,11 +86,18 @@ export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
   .superRefine((value, context) => {
     const shedNames = new Set<string>();
     value.sheds.forEach((shed, index) => {
-      if (shed.maleCount + shed.femaleCount > shed.birdCount) {
+      if (shed.capacity < shed.birdCount) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['sheds', index, 'capacity'],
+          message: 'Shed capacity cannot be lower than birds placed.',
+        });
+      }
+      if (shed.maleCount + shed.femaleCount !== shed.birdCount) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['sheds', index, 'femaleCount'],
-          message: 'Male and female counts cannot exceed birds placed.',
+          message: 'Male and female counts must equal birds placed.',
         });
       }
       if (shedNames.has(shed.name.toLowerCase())) {

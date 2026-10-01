@@ -22,7 +22,7 @@ export function ShedFields({ fields, register, errors, append, remove }: ShedFie
       <div className="repeater__heading"><h3>Shed {index + 1}</h3>{fields.length > 1 ? <Button tone="ghost" className="icon-button" aria-label={`Remove Shed ${index + 1}`} onClick={() => remove(index)}><Trash2 size={18} /></Button> : null}</div>
       <div className="form-grid form-grid--three">
         <Field label="Shed name" error={errors.sheds?.[index]?.name?.message}><TextInput {...register(`sheds.${index}.name`)} /></Field>
-        <Field label="Capacity" error={errors.sheds?.[index]?.capacity?.message}><TextInput type="number" min="0" {...register(`sheds.${index}.capacity`, { valueAsNumber: true })} /></Field>
+        <Field label="Capacity" error={errors.sheds?.[index]?.capacity?.message}><TextInput type="number" min="1" {...register(`sheds.${index}.capacity`, { valueAsNumber: true })} /></Field>
         <Field label="Batch name" error={errors.sheds?.[index]?.batchName?.message}><TextInput {...register(`sheds.${index}.batchName`)} /></Field>
         <Field label="Batch start date" error={errors.sheds?.[index]?.startDate?.message}><TextInput type="date" {...register(`sheds.${index}.startDate`)} /></Field>
         <Field label="Birds placed" error={errors.sheds?.[index]?.birdCount?.message}><TextInput type="number" min="1" {...register(`sheds.${index}.birdCount`, { valueAsNumber: true })} /></Field>
