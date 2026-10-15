@@ -61,4 +61,4 @@ Each row is a manual-contact request. The public site never provisions an accoun
 4. Review the dry-run result. Only then run the same command without `--dry-run` to create the live tenant.
 5. After successful onboarding, update the request's status to `ONBOARDED` and set `onboardedAt`. Do not mark it onboarded before the root script succeeds.
 
-The generated payload is intentionally normal JSON, compatible with the existing onboarding script and safe to copy directly into `docs/client-onboarding.json`.
+The generated payload is normal onboarding JSON and includes the required Broiler or Layer production mode. Copy it into `docs/client-onboarding.json`, then always run the documented dry-run before creating a tenant. The public trial accepts one to three sheds and one to four workers as intake limits; larger farms and owner-only setups remain supported through the core onboarding process.

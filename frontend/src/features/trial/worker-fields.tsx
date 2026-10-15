@@ -2,7 +2,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import type { FieldErrors, UseFieldArrayAppend, UseFieldArrayRemove, UseFieldArrayReturn, UseFormGetValues, UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { Button } from '../../components/ui/button';
 import { Field, SelectInput, TextInput } from '../../components/ui/field';
-import { MODULE_OPTIONS } from './schema';
+import { allowedEntryModulesForMode, type ProductionMode } from './schema';
 import type { TrialFormValues } from './trial-form';
 
 interface WorkerFieldsProps {
@@ -14,13 +14,14 @@ interface WorkerFieldsProps {
   watch: UseFormWatch<TrialFormValues>;
   getValues: UseFormGetValues<TrialFormValues>;
   setValue: UseFormSetValue<TrialFormValues>;
+  productionMode: ProductionMode | undefined;
 }
 
 const emptyWorker = { name: '', phone: '', language: 'hinglish' as const, sheds: [] as string[], modules: [] as TrialFormValues['workers'][number]['modules'] };
 
-export function WorkerFields({ fields, register, errors, append, remove, watch, getValues, setValue }: WorkerFieldsProps) {
+export function WorkerFields({ fields, register, errors, append, remove, watch, getValues, setValue, productionMode }: WorkerFieldsProps) {
   const sheds = watch('sheds');
-  const shedNames = sheds.map((shed) => shed.name).filter(Boolean);
+  const shedNames = sheds.map((_shed, index) => `Shed ${index + 1}`);
   const toggle = (index: number, key: 'sheds' | 'modules', value: string) => {
     const current = getValues(`workers.${index}.${key}`) as string[];
     setValue(`workers.${index}.${key}`, current.includes(value) ? current.filter((item) => item !== value) : [...current, value], { shouldValidate: true });
@@ -38,7 +39,7 @@ export function WorkerFields({ fields, register, errors, append, remove, watch, 
           <Field label="Preferred language"><SelectInput {...register(`workers.${index}.language`)}><option value="hinglish">Hinglish</option><option value="hi">Hindi</option></SelectInput></Field>
         </div>
         <fieldset className="choice-group"><legend>Assigned sheds</legend><div className="choice-list">{shedNames.map((shed) => <label key={shed}><input type="checkbox" checked={selectedSheds?.includes(shed) || false} onChange={() => toggle(index, 'sheds', shed)} /> {shed}</label>)}</div>{errors.workers?.[index]?.sheds?.message ? <small className="field__error">{errors.workers[index]?.sheds?.message}</small> : null}</fieldset>
-        <fieldset className="choice-group"><legend>Daily entries</legend><div className="choice-list">{MODULE_OPTIONS.map((module) => <label key={module.value}><input type="checkbox" checked={selectedModules?.includes(module.value) || false} onChange={() => toggle(index, 'modules', module.value)} /> {module.label}</label>)}</div>{errors.workers?.[index]?.modules?.message ? <small className="field__error">{errors.workers[index]?.modules?.message}</small> : null}</fieldset>
+        <fieldset className="choice-group"><legend>Daily entries</legend><div className="choice-list">{allowedEntryModulesForMode(productionMode).map((module) => <label key={module.value}><input type="checkbox" checked={selectedModules?.includes(module.value) || false} onChange={() => toggle(index, 'modules', module.value)} /> {module.label}</label>)}</div>{errors.workers?.[index]?.modules?.message ? <small className="field__error">{errors.workers[index]?.modules?.message}</small> : null}</fieldset>
       </section>;
     })}
     <Button tone="secondary" className="add-button" disabled={fields.length >= 4} onClick={() => append(emptyWorker)}><Plus size={18} /> Add worker</Button>

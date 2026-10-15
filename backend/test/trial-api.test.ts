@@ -5,6 +5,7 @@ import { createApp } from '../src/app.js';
 import type { TrialApplicationRepository } from '../src/trial/types.js';
 
 const validApplication = {
+  productionMode: 'BROILER',
   owner: { name: 'Anil Kumar', phone: '9876543210' },
   farm: {
     name: 'Kumar Poultry Farm',
@@ -15,13 +16,8 @@ const validApplication = {
   preferences: { feedStockLowThresholdKg: 800, mortalityAlertPercent: 4, paymentReminderDays: 7 },
   sheds: [
     {
-      name: 'Shed 1',
-      capacity: 5000,
-      batchName: 'September Batch',
       startDate: '2026-09-25',
       birdCount: 4500,
-      maleCount: 4500,
-      femaleCount: 0,
     },
   ],
   workers: [

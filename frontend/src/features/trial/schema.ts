@@ -7,6 +7,15 @@ export const MODULE_OPTIONS = [
   { value: 'EGG_COLLECTION', label: 'Egg collection' },
   { value: 'WEIGHT_ENTRY', label: 'Weight' },
 ] as const;
+export type ProductionMode = 'BROILER' | 'LAYER';
+export const LAYER_PROFILES = [
+  { id: '1bb29bc6-b466-42e8-99c1-dbd115316f44', label: 'Lohmann LSL Ultra Lite' },
+  { id: '21dfea74-429c-4904-bb1f-75e1aeda7932', label: 'Venky BV300' },
+  { id: '5ca34995-4c2f-499e-ab7f-6e60b4e2f872', label: 'Bovans White' },
+] as const;
+export function allowedEntryModulesForMode(mode: ProductionMode | undefined) {
+  return mode === 'BROILER' ? MODULE_OPTIONS.filter((module) => module.value !== 'EGG_COLLECTION') : MODULE_OPTIONS;
+}
 
 const requiredName = (label: string) => z.string().trim().min(1, `${label} is required.`).max(100, 'Use 100 characters or fewer.');
 const phone = z
@@ -17,6 +26,7 @@ const nonNegative = z.number({ invalid_type_error: 'Enter a valid number.' }).fi
 
 export const trialFormSchema = z
   .object({
+    productionMode: z.preprocess((value) => value === '' ? undefined : value, z.enum(['BROILER', 'LAYER'], { required_error: 'Production type is required.' })),
     owner: z.object({ name: requiredName('Owner name'), phone }),
     farm: z.object({
       name: requiredName('Farm name'),
@@ -32,13 +42,9 @@ export const trialFormSchema = z
     sheds: z
       .array(
         z.object({
-          name: requiredName('Shed name'),
-          capacity: nonNegative,
-          batchName: requiredName('Batch name'),
           startDate: z.string().date('Use YYYY-MM-DD format.'),
+          performanceProfileId: z.string().optional().refine((id) => !id || LAYER_PROFILES.some((profile) => profile.id === id), 'Select a supported Layer breed.'),
           birdCount: nonNegative.positive('Birds placed must be greater than zero.'),
-          maleCount: nonNegative,
-          femaleCount: nonNegative,
         }),
       )
       .min(1, 'Add at least one shed.')
@@ -57,18 +63,12 @@ export const trialFormSchema = z
       .max(4, 'A trial supports up to four workers.'),
   })
   .superRefine((value, context) => {
-    const shedNames = new Set(value.sheds.map((shed) => shed.name.trim().toLowerCase()));
+    value.sheds.forEach((shed, index) => {
+      if (shed.performanceProfileId && value.productionMode !== 'LAYER') context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'performanceProfileId'], message: 'Breed selection is available only for Layer farms.' });
+    });
+    const shedNames = new Set(value.sheds.map((_shed, index) => `shed ${index + 1}`));
     const workerPhones = new Set<string>();
     const ownerPhone = normalizeIndianPhone(value.owner.phone);
-
-    value.sheds.forEach((shed, index) => {
-      if (shed.capacity < shed.birdCount) {
-        context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'capacity'], message: 'Shed capacity cannot be lower than birds placed.' });
-      }
-      if (shed.maleCount + shed.femaleCount !== shed.birdCount) {
-        context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'femaleCount'], message: 'Male and female counts must equal birds placed.' });
-      }
-    });
 
     value.workers.forEach((worker, index) => {
       const workerPhone = normalizeIndianPhone(worker.phone);

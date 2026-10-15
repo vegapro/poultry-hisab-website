@@ -1,4 +1,4 @@
-import type { OnboardingPayload, TrialApplicationInput } from './types.js';
+import { allowedEntryModulesForMode, type OnboardingPayload, type TrialApplicationInput } from './types.js';
 
 const DEFAULT_CONFIG = {
   timezone: 'Asia/Kolkata',
@@ -33,6 +33,7 @@ export function buildOnboardingPayload(input: TrialApplicationInput): Onboarding
     tenant: { name: input.farm.name, slug: slugifyFarmName(input.farm.name) },
     config: {
       ...DEFAULT_CONFIG,
+      productionMode: input.productionMode,
       mortalityAlertPercent: input.preferences.mortalityAlertPercent,
       feedStockLowThresholdKg: input.preferences.feedStockLowThresholdKg,
       paymentReminderDays: input.preferences.paymentReminderDays,
@@ -40,18 +41,21 @@ export function buildOnboardingPayload(input: TrialApplicationInput): Onboarding
     farm: {
       name: input.farm.name,
       ...(input.farm.location ? { location: input.farm.location } : {}),
-      openingFeedStockKg: input.farm.openingFeedStockKg,
-      openingFeedStockRatePerKg: input.farm.openingFeedStockRatePerKg,
+      ...(input.farm.openingFeedStockKg > 0 ? {
+        openingFeedStockKg: input.farm.openingFeedStockKg,
+        openingFeedStockRatePerKg: input.farm.openingFeedStockRatePerKg,
+      } : {}),
     },
-    sheds: input.sheds.map((shed) => ({
-      name: shed.name,
-      capacity: shed.capacity,
+    sheds: input.sheds.map((shed, index) => ({
+      name: `Shed ${index + 1}`,
+      capacity: shed.birdCount,
       batch: {
-        name: shed.batchName,
+        ...(input.productionMode === 'LAYER' && shed.performanceProfileId ? { performanceProfileId: shed.performanceProfileId } : {}),
+        name: `${new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${shed.startDate}T00:00:00.000Z`))} Batch`,
         startDate: shed.startDate,
         birdCount: shed.birdCount,
-        maleCount: shed.maleCount,
-        femaleCount: shed.femaleCount,
+        maleCount: input.productionMode === 'BROILER' ? shed.birdCount : 0,
+        femaleCount: input.productionMode === 'LAYER' ? shed.birdCount : 0,
       },
     })),
     owners: [{ name: input.owner.name, phone: input.owner.phone, role: 'FARM_OWNER' }],
@@ -60,7 +64,7 @@ export function buildOnboardingPayload(input: TrialApplicationInput): Onboarding
       phone: worker.phone,
       language: worker.language,
       sheds: worker.sheds,
-      modules: worker.modules,
+      modules: worker.modules.filter((module) => allowedEntryModulesForMode(input.productionMode).includes(module)),
     })),
   };
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ENTRY_MODULES, type TrialApplicationInput } from './types.js';
+import { allowedEntryModulesForMode, ENTRY_MODULES, type TrialApplicationInput } from './types.js';
 
 const PHONE_PATTERN = /^[6-9]\d{9}$/;
 
@@ -35,6 +35,7 @@ const positiveNumber = z.number().finite('Enter a valid number.').positive('Ente
 
 export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
   .object({
+    productionMode: z.enum(['BROILER', 'LAYER']),
     owner: z.object({ name: nameSchema, phone: phoneSchema() }).strict(),
     farm: z
       .object({
@@ -55,13 +56,9 @@ export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
       .array(
         z
           .object({
-            name: nameSchema,
-            capacity: nonNegativeNumber,
-            batchName: nameSchema,
             startDate: z.string().date('Use YYYY-MM-DD format.'),
+            performanceProfileId: z.union([z.literal(''), z.enum(['1bb29bc6-b466-42e8-99c1-dbd115316f44', '21dfea74-429c-4904-bb1f-75e1aeda7932', '5ca34995-4c2f-499e-ab7f-6e60b4e2f872'])]).optional().transform((id) => id || undefined),
             birdCount: positiveNumber,
-            maleCount: nonNegativeNumber,
-            femaleCount: nonNegativeNumber,
           })
           .strict(),
       )
@@ -84,27 +81,10 @@ export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
   })
   .strict()
   .superRefine((value, context) => {
-    const shedNames = new Set<string>();
     value.sheds.forEach((shed, index) => {
-      if (shed.capacity < shed.birdCount) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['sheds', index, 'capacity'],
-          message: 'Shed capacity cannot be lower than birds placed.',
-        });
-      }
-      if (shed.maleCount + shed.femaleCount !== shed.birdCount) {
-        context.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['sheds', index, 'femaleCount'],
-          message: 'Male and female counts must equal birds placed.',
-        });
-      }
-      if (shedNames.has(shed.name.toLowerCase())) {
-        context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'name'], message: 'Shed names must be unique.' });
-      }
-      shedNames.add(shed.name.toLowerCase());
+      if (shed.performanceProfileId && value.productionMode !== 'LAYER') context.addIssue({ code: z.ZodIssueCode.custom, path: ['sheds', index, 'performanceProfileId'], message: 'Breed selection is available only for Layer farms.' });
     });
+    const shedNames = new Set(value.sheds.map((_shed, index) => `shed ${index + 1}`));
 
     const workerPhones = new Set<string>();
     value.workers.forEach((worker, index) => {
@@ -129,5 +109,12 @@ export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
           });
         }
       });
+      if (worker.modules.some((module) => !allowedEntryModulesForMode(value.productionMode).includes(module))) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['workers', index, 'modules'],
+          message: 'Egg collection is available only for layer trials.',
+        });
+      }
     });
   });

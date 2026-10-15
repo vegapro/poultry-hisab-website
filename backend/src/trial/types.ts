@@ -1,8 +1,16 @@
 export const ENTRY_MODULES = ['FEED', 'MORTALITY', 'EGG_COLLECTION', 'WEIGHT_ENTRY'] as const;
 
 export type EntryModule = (typeof ENTRY_MODULES)[number];
+export type ProductionMode = 'BROILER' | 'LAYER';
+
+export function allowedEntryModulesForMode(mode: ProductionMode): EntryModule[] {
+  return mode === 'BROILER'
+    ? ENTRY_MODULES.filter((module) => module !== 'EGG_COLLECTION')
+    : [...ENTRY_MODULES];
+}
 
 export interface TrialApplicationInput {
+  productionMode: ProductionMode;
   owner: {
     name: string;
     phone: string;
@@ -19,13 +27,9 @@ export interface TrialApplicationInput {
     paymentReminderDays: number;
   };
   sheds: Array<{
-    name: string;
-    capacity: number;
-    batchName: string;
-    startDate: string;
-    birdCount: number;
-    maleCount: number;
-    femaleCount: number;
+      performanceProfileId?: string;
+      startDate: string;
+      birdCount: number;
   }>;
   workers: Array<{
     name: string;
@@ -52,17 +56,19 @@ export interface OnboardingPayload {
     paymentReminderDays: number;
     salesAlertsEnabled: boolean;
     paymentRemindersEnabled: boolean;
+    productionMode: ProductionMode;
   };
   farm: {
     name: string;
     location?: string;
-    openingFeedStockKg: number;
-    openingFeedStockRatePerKg: number;
+    openingFeedStockKg?: number;
+    openingFeedStockRatePerKg?: number;
   };
   sheds: Array<{
     name: string;
     capacity: number;
     batch: {
+      performanceProfileId?: string;
       name: string;
       startDate: string;
       birdCount: number;
