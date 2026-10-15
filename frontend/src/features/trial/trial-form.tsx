@@ -1,9 +1,9 @@
 import { CheckCircle2, ChevronLeft, ChevronRight, LoaderCircle, Send } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '../../components/ui/button';
-import { Field, TextInput } from '../../components/ui/field';
+import { Field, SelectInput, TextInput } from '../../components/ui/field';
 import type { TrialApplicationResponse } from '../../lib/api';
 import { submitTrialApplication } from '../../lib/api';
 import { trialFormSchema } from './schema';
@@ -11,18 +11,20 @@ import { ShedFields } from './shed-fields';
 import { WorkerFields } from './worker-fields';
 
 export type TrialFormValues = {
+  productionMode: 'BROILER' | 'LAYER';
   owner: { name: string; phone: string };
   farm: { name: string; location: string; openingFeedStockKg: number; openingFeedStockRatePerKg: number };
   preferences: { feedStockLowThresholdKg: number; mortalityAlertPercent: number; paymentReminderDays: number };
-  sheds: Array<{ name: string; capacity: number; batchName: string; startDate: string; birdCount: number; maleCount: number; femaleCount: number }>;
+  sheds: Array<{ startDate: string; birdCount: number; performanceProfileId?: string }>;
   workers: Array<{ name: string; phone: string; language: 'hinglish' | 'hi'; sheds: string[]; modules: Array<'FEED' | 'MORTALITY' | 'EGG_COLLECTION' | 'WEIGHT_ENTRY'> }>;
 };
 
 const DEFAULT_VALUES: TrialFormValues = {
+  productionMode: undefined as unknown as 'BROILER' | 'LAYER',
   owner: { name: '', phone: '' },
   farm: { name: '', location: '', openingFeedStockKg: 0, openingFeedStockRatePerKg: 0 },
   preferences: { feedStockLowThresholdKg: 1000, mortalityAlertPercent: 5, paymentReminderDays: 10 },
-  sheds: [{ name: '', capacity: 0, batchName: '', startDate: '', birdCount: 0, maleCount: 0, femaleCount: 0 }],
+  sheds: [{ startDate: '', birdCount: 0 }],
   workers: [{ name: '', phone: '', language: 'hinglish', sheds: [], modules: [] }],
 };
 
@@ -45,7 +47,16 @@ export function TrialForm({ initialValues, submitApplication = submitTrialApplic
   const shedFields = useFieldArray({ control, name: 'sheds' });
   const workerFields = useFieldArray({ control, name: 'workers' });
   const values = watch();
+  const productionMode = watch('productionMode');
   const reviewShedCount = useMemo(() => values.sheds.length, [values.sheds.length]);
+  useEffect(() => {
+    if (productionMode === 'BROILER') {
+      getValues('sheds').forEach((_shed, index) => setValue(`sheds.${index}.performanceProfileId`, undefined));
+      getValues('workers').forEach((worker, index) => {
+        if (worker.modules.includes('EGG_COLLECTION')) setValue(`workers.${index}.modules`, worker.modules.filter((module) => module !== 'EGG_COLLECTION'));
+      });
+    }
+  }, [getValues, productionMode, setValue]);
 
   const validateFullForm = () => {
     const result = trialFormSchema.safeParse(getValues());
@@ -60,7 +71,7 @@ export function TrialForm({ initialValues, submitApplication = submitTrialApplic
   const goNext = async () => {
     setSubmitError(null);
     const fieldsByStep = [
-      ['owner.name', 'owner.phone', 'farm.name', 'farm.location'],
+      ['productionMode', 'owner.name', 'owner.phone', 'farm.name', 'farm.location'],
       ['farm.openingFeedStockKg', 'farm.openingFeedStockRatePerKg', 'preferences.feedStockLowThresholdKg', 'preferences.mortalityAlertPercent', 'preferences.paymentReminderDays'],
       ['sheds'],
       ['workers'],
@@ -91,6 +102,7 @@ export function TrialForm({ initialValues, submitApplication = submitTrialApplic
       <Field label="Owner WhatsApp number" error={errors.owner?.phone?.message}><TextInput inputMode="numeric" autoComplete="tel" {...register('owner.phone')} /></Field>
       <Field label="Farm name" error={errors.farm?.name?.message}><TextInput {...register('farm.name')} /></Field>
       <Field label="Farm location" error={errors.farm?.location?.message}><TextInput {...register('farm.location')} /></Field>
+      <Field label="Production type" error={errors.productionMode?.message}><SelectInput aria-label="Production type" {...register('productionMode')}><option value="">Select farm type</option><option value="BROILER">Broiler</option><option value="LAYER">Layer</option></SelectInput></Field>
     </div> : null}
 
     {step === 1 ? <div className="form-grid form-grid--two">
@@ -101,8 +113,8 @@ export function TrialForm({ initialValues, submitApplication = submitTrialApplic
       <Field label="Payment reminder after (days)" error={errors.preferences?.paymentReminderDays?.message}><TextInput type="number" min="0" {...register('preferences.paymentReminderDays', { valueAsNumber: true })} /></Field>
     </div> : null}
 
-    {step === 2 ? <ShedFields fields={shedFields.fields} register={register} errors={errors} append={shedFields.append} remove={shedFields.remove} /> : null}
-    {step === 3 ? <WorkerFields fields={workerFields.fields} register={register} errors={errors} append={workerFields.append} remove={workerFields.remove} watch={watch} getValues={getValues} setValue={setValue} /> : null}
+    {step === 2 ? <ShedFields fields={shedFields.fields} register={register} errors={errors} append={shedFields.append} remove={shedFields.remove} watch={watch} /> : null}
+    {step === 3 ? <WorkerFields fields={workerFields.fields} register={register} errors={errors} append={workerFields.append} remove={workerFields.remove} watch={watch} getValues={getValues} setValue={setValue} productionMode={productionMode} /> : null}
     {step === 4 ? <div className="review-grid"><div><span>Farm</span><strong>{values.farm.name}</strong></div><div><span>Owner</span><strong>{values.owner.name}</strong></div><div><span>Sheds</span><strong>{reviewShedCount}</strong></div><div><span>Workers</span><strong>{values.workers.length}</strong></div><p>We will review these details before setting up your farm. No trial account is created until our team contacts you.</p></div> : null}
 
     {submitError ? <p className="form-error" role="alert">{submitError}</p> : null}

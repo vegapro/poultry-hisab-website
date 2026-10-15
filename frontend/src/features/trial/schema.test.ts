@@ -2,41 +2,40 @@ import { describe, expect, it } from 'vitest';
 import { trialFormSchema } from './schema';
 
 const validApplication = {
+  productionMode: 'BROILER' as const,
   owner: { name: 'Anil Kumar', phone: '9876543210' },
   farm: { name: 'Kumar Poultry Farm', location: 'Prayagraj', openingFeedStockKg: 5000, openingFeedStockRatePerKg: 35 },
   preferences: { feedStockLowThresholdKg: 800, mortalityAlertPercent: 4, paymentReminderDays: 7 },
-  sheds: [{ name: 'Shed 1', capacity: 5000, batchName: 'September Batch', startDate: '2026-09-25', birdCount: 4500, maleCount: 4500, femaleCount: 0 }],
+  sheds: [{ startDate: '2026-09-25', birdCount: 4500 }],
   workers: [{ name: 'Ramesh', phone: '9876543211', language: 'hi' as const, sheds: ['Shed 1'], modules: ['FEED' as const] }],
 };
 
 describe('trialFormSchema', () => {
-  it('rejects a batch with more birds than its shed capacity', () => {
+  it('rejects a non-positive bird count', () => {
     const invalid = structuredClone(validApplication);
-    invalid.sheds[0].capacity = 4_499;
+    invalid.sheds[0].birdCount = 0;
 
     const result = trialFormSchema.safeParse(invalid);
 
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues).toContainEqual(expect.objectContaining({
-        path: ['sheds', 0, 'capacity'],
-        message: 'Shed capacity cannot be lower than birds placed.',
+        path: ['sheds', 0, 'birdCount'],
+        message: 'Birds placed must be greater than zero.',
       }));
     }
   });
 
-  it('rejects a batch whose male and female counts do not equal birds placed', () => {
+  it('requires an explicit production mode', () => {
     const invalid = structuredClone(validApplication);
-    invalid.sheds[0].maleCount = 3;
-    invalid.sheds[0].femaleCount = 3;
+    delete (invalid as Partial<typeof invalid>).productionMode;
 
     const result = trialFormSchema.safeParse(invalid);
 
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues).toContainEqual(expect.objectContaining({
-        path: ['sheds', 0, 'femaleCount'],
-        message: 'Male and female counts must equal birds placed.',
+        path: ['productionMode'],
       }));
     }
   });
