@@ -30,6 +30,7 @@ export interface TrialApplicationInput {
       performanceProfileId?: string;
       startDate: string;
       birdCount: number;
+      weeklyWeightDay?: string;
   }>;
   workers: Array<{
     name: string;
@@ -67,6 +68,7 @@ export interface OnboardingPayload {
   sheds: Array<{
     name: string;
     capacity: number;
+    weeklyWeightDay?: string;
     batch: {
       performanceProfileId?: string;
       name: string;

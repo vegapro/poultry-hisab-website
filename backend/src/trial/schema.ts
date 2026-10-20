@@ -59,6 +59,7 @@ export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
             startDate: z.string().date('Use YYYY-MM-DD format.'),
             performanceProfileId: z.union([z.literal(''), z.enum(['1bb29bc6-b466-42e8-99c1-dbd115316f44', '21dfea74-429c-4904-bb1f-75e1aeda7932', '5ca34995-4c2f-499e-ab7f-6e60b4e2f872'])]).optional().transform((id) => id || undefined),
             birdCount: positiveNumber,
+            weeklyWeightDay: z.union([z.literal(''), z.enum(['0', '1', '2', '3', '4', '5', '6'])]).optional().transform((value) => value || undefined),
           })
           .strict(),
       )
