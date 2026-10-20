@@ -49,6 +49,7 @@ export function buildOnboardingPayload(input: TrialApplicationInput): Onboarding
     sheds: input.sheds.map((shed, index) => ({
       name: `Shed ${index + 1}`,
       capacity: shed.birdCount,
+      ...(shed.weeklyWeightDay ? { weeklyWeightDay: shed.weeklyWeightDay } : {}),
       batch: {
         ...(input.productionMode === 'LAYER' && shed.performanceProfileId ? { performanceProfileId: shed.performanceProfileId } : {}),
         name: `${new Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${shed.startDate}T00:00:00.000Z`))} Batch`,

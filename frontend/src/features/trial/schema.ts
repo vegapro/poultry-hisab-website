@@ -45,6 +45,7 @@ export const trialFormSchema = z
           startDate: z.string().date('Use YYYY-MM-DD format.'),
           performanceProfileId: z.string().optional().refine((id) => !id || LAYER_PROFILES.some((profile) => profile.id === id), 'Select a supported Layer breed.'),
           birdCount: nonNegative.positive('Birds placed must be greater than zero.'),
+          weeklyWeightDay: z.enum(['0', '1', '2', '3', '4', '5', '6']).optional(),
         }),
       )
       .min(1, 'Add at least one shed.')

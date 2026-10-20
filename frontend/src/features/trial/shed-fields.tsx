@@ -90,6 +90,11 @@ export function ShedFields({
                 })}
               />
             </Field>
+            <Field label="Weekly weight day (optional)" error={errors.sheds?.[index]?.weeklyWeightDay?.message}>
+              <SelectInput {...register(`sheds.${index}.weeklyWeightDay`)}>
+                <option value="">No weekly reminder</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
+              </SelectInput>
+            </Field>
           </div>
         </section>
       ))}
