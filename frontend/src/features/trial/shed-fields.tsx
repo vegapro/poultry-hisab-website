@@ -79,7 +79,7 @@ export function ShedFields({
               />
             </Field>
             <Field
-              label="Birds placed"
+              label="Live birds"
               error={errors.sheds?.[index]?.birdCount?.message}
             >
               <TextInput
@@ -101,7 +101,6 @@ export function ShedFields({
       <Button
         tone="secondary"
         className="add-button"
-        disabled={fields.length >= 3}
         onClick={() => append(emptyShed)}
       >
         <Plus size={18} /> Add shed

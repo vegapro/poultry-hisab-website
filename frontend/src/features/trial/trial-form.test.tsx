@@ -131,6 +131,21 @@ describe('TrialForm', () => {
     expect(await screen.findByText('October 2026 Batch')).toBeInTheDocument();
   });
 
+  it('uses live-bird and feed-inventory labels and allows adding a fourth shed', async () => {
+    render(<TrialForm initialValues={validValues} submitApplication={vi.fn()} />);
+
+    await moveToStep('Farm preferences');
+    expect(screen.getByLabelText('Feed inventory (kg) as of today')).toBeInTheDocument();
+    await moveToStep('Sheds and batches');
+    expect(screen.getByLabelText('Live birds')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Add shed' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add shed' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add shed' }));
+
+    expect(screen.getByText('Shed 4')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add shed' })).toBeEnabled();
+  });
+
   it('submits a valid five-step application once and shows manual-review success', async () => {
     const submitApplication = vi.fn().mockResolvedValue({ id: 'trial-uuid', status: 'NEW' });
     render(<TrialForm initialValues={validValues} submitApplication={submitApplication} />);
