@@ -66,6 +66,16 @@ describe('trial application schema', () => {
 
     expect(() => trialApplicationSchema.parse(invalid)).toThrow('Egg collection is available only for layer trials');
   });
+
+  it('accepts more than three sheds', () => {
+    const application = structuredClone(validApplication);
+    application.sheds = Array.from({ length: 4 }, () => ({
+      startDate: '2026-09-25',
+      birdCount: 4500,
+    }));
+
+    expect(trialApplicationSchema.safeParse(application).success).toBe(true);
+  });
 });
 
 describe('buildOnboardingPayload', () => {

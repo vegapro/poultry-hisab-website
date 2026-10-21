@@ -44,12 +44,11 @@ export const trialFormSchema = z
         z.object({
           startDate: z.string().date('Use YYYY-MM-DD format.'),
           performanceProfileId: z.string().optional().refine((id) => !id || LAYER_PROFILES.some((profile) => profile.id === id), 'Select a supported Layer breed.'),
-          birdCount: nonNegative.positive('Birds placed must be greater than zero.'),
-          weeklyWeightDay: z.enum(['0', '1', '2', '3', '4', '5', '6']).optional(),
+          birdCount: nonNegative.positive('Live birds must be greater than zero.'),
+          weeklyWeightDay: z.union([z.literal(''), z.enum(['0', '1', '2', '3', '4', '5', '6'])]).optional().transform((value) => value || undefined),
         }),
       )
-      .min(1, 'Add at least one shed.')
-      .max(3, 'A trial supports up to three sheds.'),
+      .min(1, 'Add at least one shed.'),
     workers: z
       .array(
         z.object({

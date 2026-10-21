@@ -106,7 +106,7 @@ export function TrialForm({ initialValues, submitApplication = submitTrialApplic
     </div> : null}
 
     {step === 1 ? <div className="form-grid form-grid--two">
-      <Field label="Opening feed stock (kg)" error={errors.farm?.openingFeedStockKg?.message}><TextInput type="number" min="0" {...register('farm.openingFeedStockKg', { valueAsNumber: true })} /></Field>
+      <Field label="Feed inventory (kg) as of today" error={errors.farm?.openingFeedStockKg?.message}><TextInput type="number" min="0" {...register('farm.openingFeedStockKg', { valueAsNumber: true })} /></Field>
       <Field label="Opening feed rate (Rs/kg)" error={errors.farm?.openingFeedStockRatePerKg?.message}><TextInput type="number" min="0" {...register('farm.openingFeedStockRatePerKg', { valueAsNumber: true })} /></Field>
       <Field label="Low-feed alert level (kg)" error={errors.preferences?.feedStockLowThresholdKg?.message}><TextInput type="number" min="0" {...register('preferences.feedStockLowThresholdKg', { valueAsNumber: true })} /></Field>
       <Field label="Mortality alert level (%)" error={errors.preferences?.mortalityAlertPercent?.message}><TextInput type="number" min="0" max="100" {...register('preferences.mortalityAlertPercent', { valueAsNumber: true })} /></Field>

@@ -21,7 +21,7 @@ describe('trialFormSchema', () => {
     if (!result.success) {
       expect(result.error.issues).toContainEqual(expect.objectContaining({
         path: ['sheds', 0, 'birdCount'],
-        message: 'Birds placed must be greater than zero.',
+        message: 'Live birds must be greater than zero.',
       }));
     }
   });
@@ -38,5 +38,16 @@ describe('trialFormSchema', () => {
         path: ['productionMode'],
       }));
     }
+  });
+
+  it('accepts more than three sheds and an empty optional weekly weight day', () => {
+    const application = structuredClone(validApplication);
+    application.sheds = Array.from({ length: 4 }, () => ({
+      startDate: '2026-09-25',
+      birdCount: 4500,
+      weeklyWeightDay: '',
+    }));
+
+    expect(trialFormSchema.safeParse(application).success).toBe(true);
   });
 });

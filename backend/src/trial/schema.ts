@@ -63,8 +63,7 @@ export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
           })
           .strict(),
       )
-      .min(1, 'Add at least one shed.')
-      .max(3, 'A trial supports up to three sheds.'),
+      .min(1, 'Add at least one shed.'),
     workers: z
       .array(
         z
