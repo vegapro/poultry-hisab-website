@@ -113,7 +113,7 @@ export const trialApplicationSchema: z.ZodType<TrialApplicationInput> = z
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['workers', index, 'modules'],
-          message: 'Egg collection is available only for layer trials.',
+          message: 'Egg modules are available only for layer trials.',
         });
       }
     });

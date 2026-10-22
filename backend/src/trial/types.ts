@@ -1,11 +1,11 @@
-export const ENTRY_MODULES = ['FEED', 'MORTALITY', 'EGG_COLLECTION', 'WEIGHT_ENTRY'] as const;
+export const ENTRY_MODULES = ['FEED', 'MORTALITY', 'EGG_COLLECTION', 'EGG_SALE', 'WEIGHT_ENTRY'] as const;
 
 export type EntryModule = (typeof ENTRY_MODULES)[number];
 export type ProductionMode = 'BROILER' | 'LAYER';
 
 export function allowedEntryModulesForMode(mode: ProductionMode): EntryModule[] {
   return mode === 'BROILER'
-    ? ENTRY_MODULES.filter((module) => module !== 'EGG_COLLECTION')
+    ? ENTRY_MODULES.filter((module) => module !== 'EGG_COLLECTION' && module !== 'EGG_SALE')
     : [...ENTRY_MODULES];
 }
 

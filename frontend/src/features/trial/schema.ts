@@ -5,6 +5,7 @@ export const MODULE_OPTIONS = [
   { value: 'FEED', label: 'Feed' },
   { value: 'MORTALITY', label: 'Mortality' },
   { value: 'EGG_COLLECTION', label: 'Egg collection' },
+  { value: 'EGG_SALE', label: 'Egg sales' },
   { value: 'WEIGHT_ENTRY', label: 'Weight' },
 ] as const;
 export type ProductionMode = 'BROILER' | 'LAYER';
@@ -14,7 +15,7 @@ export const LAYER_PROFILES = [
   { id: '5ca34995-4c2f-499e-ab7f-6e60b4e2f872', label: 'Bovans White' },
 ] as const;
 export function allowedEntryModulesForMode(mode: ProductionMode | undefined) {
-  return mode === 'BROILER' ? MODULE_OPTIONS.filter((module) => module.value !== 'EGG_COLLECTION') : MODULE_OPTIONS;
+  return mode === 'BROILER' ? MODULE_OPTIONS.filter((module) => module.value !== 'EGG_COLLECTION' && module.value !== 'EGG_SALE') : MODULE_OPTIONS;
 }
 
 const requiredName = (label: string) => z.string().trim().min(1, `${label} is required.`).max(100, 'Use 100 characters or fewer.');
@@ -56,7 +57,7 @@ export const trialFormSchema = z
           phone,
           language: z.enum(['hinglish', 'hi']),
           sheds: z.array(z.string()).min(1, 'Assign at least one shed.'),
-          modules: z.array(z.enum(['FEED', 'MORTALITY', 'EGG_COLLECTION', 'WEIGHT_ENTRY'])).min(1, 'Select at least one module.'),
+          modules: z.array(z.enum(['FEED', 'MORTALITY', 'EGG_COLLECTION', 'EGG_SALE', 'WEIGHT_ENTRY'])).min(1, 'Select at least one module.'),
         }),
       )
       .min(1, 'Add at least one worker.')
