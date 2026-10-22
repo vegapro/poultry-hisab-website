@@ -64,7 +64,15 @@ describe('trial application schema', () => {
     const invalid = structuredClone(validApplication);
     invalid.workers[0].modules = ['FEED', 'EGG_COLLECTION'] as any;
 
-    expect(() => trialApplicationSchema.parse(invalid)).toThrow('Egg collection is available only for layer trials');
+    expect(() => trialApplicationSchema.parse(invalid)).toThrow('Egg modules are available only for layer trials');
+  });
+
+  it('accepts Egg sales only for a Layer trial', () => {
+    const layer = structuredClone(validApplication);
+    layer.productionMode = 'LAYER';
+    layer.workers[0].modules = ['FEED', 'EGG_SALE'] as any;
+    expect(trialApplicationSchema.safeParse(layer).success).toBe(true);
+    expect(trialApplicationSchema.safeParse({ ...layer, productionMode: 'BROILER' }).success).toBe(false);
   });
 
   it('accepts more than three sheds', () => {

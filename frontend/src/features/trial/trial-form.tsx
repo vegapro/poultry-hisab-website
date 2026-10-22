@@ -16,7 +16,7 @@ export type TrialFormValues = {
   farm: { name: string; location: string; openingFeedStockKg: number; openingFeedStockRatePerKg: number };
   preferences: { feedStockLowThresholdKg: number; mortalityAlertPercent: number; paymentReminderDays: number };
   sheds: Array<{ startDate: string; birdCount: number; performanceProfileId?: string; weeklyWeightDay?: string }>;
-  workers: Array<{ name: string; phone: string; language: 'hinglish' | 'hi'; sheds: string[]; modules: Array<'FEED' | 'MORTALITY' | 'EGG_COLLECTION' | 'WEIGHT_ENTRY'> }>;
+  workers: Array<{ name: string; phone: string; language: 'hinglish' | 'hi'; sheds: string[]; modules: Array<'FEED' | 'MORTALITY' | 'EGG_COLLECTION' | 'EGG_SALE' | 'WEIGHT_ENTRY'> }>;
 };
 
 const DEFAULT_VALUES: TrialFormValues = {
