@@ -1,4 +1,4 @@
-# PoultryHisab Website
+# PoultryHisab Website readme
 
 Standalone public website and manual trial-intake service. It uses the existing Neon PostgreSQL project; it does not create a second database, a live tenant, users, messages, or farm records automatically.
 
@@ -11,9 +11,9 @@ Deploy this repository as a separate Railway project with two services:
 
 Use these Railway commands:
 
-| Service | Build command | Start command |
-| --- | --- | --- |
-| Backend | `cd backend && npm ci && npm run build` | `cd backend && npm run start` |
+| Service  | Build command                            | Start command                  |
+| -------- | ---------------------------------------- | ------------------------------ |
+| Backend  | `cd backend && npm ci && npm run build`  | `cd backend && npm run start`  |
 | Frontend | `cd frontend && npm ci && npm run build` | `cd frontend && npm run start` |
 
 Run the following SQL once in the Neon SQL Editor connected to the same database as PoultryHisab:
